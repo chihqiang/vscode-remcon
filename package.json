@@ -1,0 +1,448 @@
+{
+  "name": "remcon",
+  "displayName": "remcon",
+  "description": "Remote Connection Manager — SSH/SFTP terminal, file browser, port forwarding, batch ops, and more",
+  "version": "0.0.1",
+  "publisher": "chihqiang",
+  "icon": "resources/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chihqiang/vscode-remcon.git"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "ssh",
+    "sftp",
+    "remote",
+    "connection",
+    "server",
+    "linux",
+    "terminal",
+    "tunnel",
+    "port-forwarding",
+    "file-transfer",
+    "devops",
+    "sysadmin"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Remote Connection",
+      "properties": {
+        "remcon.default.pingHostTime": {
+          "type": "number",
+          "default": 30,
+          "enum": [
+            5,
+            10,
+            15,
+            30,
+            60,
+            120,
+            180,
+            300
+          ],
+          "markdownDescription": "%remcon.properties.pingHostTime%"
+        },
+        "remcon.default.refreshNodeTime": {
+          "type": "number",
+          "default": 30,
+          "enum": [
+            5,
+            10,
+            15,
+            30,
+            60,
+            120,
+            180,
+            300
+          ],
+          "markdownDescription": "%remcon.properties.refreshNodeTime%"
+        },
+        "remcon.default.showHiddenFiles": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%remcon.properties.showHiddenFiles%"
+        },
+        "remcon.default.openFileMaxSize": {
+          "type": "number",
+          "default": 10,
+          "markdownDescription": "%remcon.properties.openFileMaxSize%"
+        },
+        "remcon.default.readyTimeout": {
+          "type": "number",
+          "default": 10000,
+          "markdownDescription": "%remcon.properties.readyTimeout%"
+        },
+        "remcon.default.keepaliveInterval": {
+          "type": "number",
+          "default": 30000,
+          "markdownDescription": "%remcon.properties.keepaliveInterval%"
+        },
+        "remcon.default.keepaliveCountMax": {
+          "type": "number",
+          "default": 3,
+          "markdownDescription": "%remcon.properties.keepaliveCountMax%"
+        },
+        "remcon.default.tryKeyboard": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%remcon.properties.tryKeyboard%"
+        },
+        "remcon.locale": {
+          "type": "string",
+          "default": "auto",
+          "enum": [
+            "auto",
+            "en",
+            "zh-cn"
+          ],
+          "markdownDescription": "%remcon.properties.locale%"
+        },
+        "remcon.hostfile.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%remcon.properties.hostfile.enabled%"
+        },
+        "remcon.hostfile.path": {
+          "type": "string",
+          "default": "~/.remcon/hosts.json",
+          "markdownDescription": "%remcon.properties.hostfile.path%"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "remcon-host",
+          "title": "%remcon.title%",
+          "icon": "$(remote)"
+        }
+      ]
+    },
+    "views": {
+      "remcon-host": [
+        {
+          "id": "remcon.online",
+          "name": "%remcon.online.title%"
+        },
+        {
+          "id": "remcon.offline",
+          "name": "%remcon.offline.title%"
+        },
+        {
+          "id": "remcon.sftp",
+          "name": "%remcon.sftp.title%"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "remcon.online",
+        "contents": "%remcon.viewWelcome.host%"
+      },
+      {
+        "view": "remcon.offline",
+        "contents": "%remcon.viewWelcome.host%"
+      },
+      {
+        "view": "remcon.sftp",
+        "contents": "%remcon.viewWelcome.sftp%"
+      }
+    ],
+    "commands": [
+      {
+        "command": "remcon.add",
+        "title": "%remcon.command.add%",
+        "icon": "$(plus)"
+      },
+      {
+        "command": "remcon.edit",
+        "title": "%remcon.command.edit%"
+      },
+      {
+        "command": "remcon.delete",
+        "title": "%remcon.command.delete%",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "remcon.refresh",
+        "title": "%remcon.command.refresh%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "remcon.reload",
+        "title": "%remcon.command.reload%",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "remcon.connect.terminal",
+        "title": "%remcon.command.terminal%",
+        "icon": "$(terminal)"
+      },
+      {
+        "command": "remcon.disconnect",
+        "title": "%remcon.command.disconnect%",
+        "icon": "$(debug-disconnect)"
+      },
+      {
+        "command": "remcon.clearAll",
+        "title": "%remcon.command.clearAll%"
+      },
+      {
+        "command": "remcon.sftp.download",
+        "title": "%remcon.command.sftp.download%",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "remcon.sftp.upload",
+        "title": "%remcon.command.sftp.upload%",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "remcon.sftp.uploadExplorer",
+        "title": "%remcon.command.sftp.uploadExplorer%",
+        "icon": "$(cloud-upload)"
+      },
+      {
+        "command": "remcon.sftp.newFile",
+        "title": "%remcon.command.sftp.newFile%"
+      },
+      {
+        "command": "remcon.sftp.newFolder",
+        "title": "%remcon.command.sftp.newFolder%"
+      },
+      {
+        "command": "remcon.sftp.delete",
+        "title": "%remcon.command.sftp.delete%"
+      },
+      {
+        "command": "remcon.sftp.rename",
+        "title": "%remcon.command.sftp.rename%"
+      },
+      {
+        "command": "remcon.sftp.refresh",
+        "title": "%remcon.command.refresh%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "remcon.sftp.open",
+        "title": "%remcon.command.sftp.open%",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "remcon.import.sshConfig",
+        "title": "%remcon.command.import.sshConfig%",
+        "icon": "$(database-import)"
+      },
+      {
+        "command": "remcon.search",
+        "title": "%remcon.command.search%",
+        "icon": "$(search)"
+      },
+      {
+        "command": "remcon.batch",
+        "title": "%remcon.command.batch%",
+        "icon": "$(list-selection)"
+      },
+      {
+        "command": "remcon.tunnel.add",
+        "title": "%remcon.command.tunnel.add%",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "remcon.setLocale",
+        "title": "%remcon.command.setLocale%"
+      },
+      {
+        "command": "remcon.testConnection",
+        "title": "%remcon.command.testConnection%",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "remcon.openSettings",
+        "title": "%remcon.command.openSettings%"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "remcon.add",
+          "when": "view == remcon.online",
+          "group": "navigation@0"
+        },
+        {
+          "command": "remcon.refresh",
+          "when": "view =~ /^remcon\\.(online|offline)$/",
+          "group": "navigation@1"
+        },
+        {
+          "command": "remcon.reload",
+          "when": "view =~ /^remcon\\.(online|offline)$/",
+          "group": "navigation@2"
+        },
+        {
+          "command": "remcon.search",
+          "when": "view =~ /^remcon\\.(online|offline)$/",
+          "group": "navigation@3"
+        },
+        {
+          "command": "remcon.clearAll",
+          "when": "view == remcon.online",
+          "group": "navigation@4"
+        },
+        {
+          "command": "remcon.sftp.refresh",
+          "when": "view == remcon.sftp",
+          "group": "navigation@0"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "remcon.connect.terminal",
+          "when": "view =~ /^remcon\\.(online|offline)$/ && viewItem =~ /^(ssh|online|offline)$/",
+          "group": "inline@0"
+        },
+        {
+          "command": "remcon.testConnection",
+          "when": "view == remcon.offline && viewItem =~ /^(offline)$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "remcon.disconnect",
+          "when": "view == remcon.online && viewItem =~ /^(ssh|online)$/",
+          "group": "inline@2"
+        },
+        {
+          "command": "remcon.delete",
+          "when": "view =~ /^remcon\\.(online|offline)$/ && viewItem =~ /^(ssh|online|offline|group)$/",
+          "group": "inline@2"
+        },
+        {
+          "command": "remcon.edit",
+          "when": "view =~ /^remcon\\.(online|offline)$/ && viewItem =~ /^(ssh|online|offline)$/",
+          "group": "1_edit@0"
+        },
+        {
+          "command": "remcon.tunnel.add",
+          "when": "view == remcon.online && viewItem =~ /^(ssh|online)$/",
+          "group": "3_tunnel@0"
+        },
+        {
+          "command": "remcon.sftp.download",
+          "when": "view == remcon.sftp && viewItem =~ /^sftpFile$/",
+          "group": "inline@0"
+        },
+        {
+          "command": "remcon.sftp.open",
+          "when": "view == remcon.sftp && viewItem =~ /^sftpFile$/",
+          "group": "inline@1"
+        },
+        {
+          "command": "remcon.sftp.delete",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpFile|sftpFolder|sftpLink)$/",
+          "group": "inline@2"
+        },
+        {
+          "command": "remcon.sftp.newFile",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpRoot|sftpFolder)$/",
+          "group": "1_create@0"
+        },
+        {
+          "command": "remcon.sftp.newFolder",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpRoot|sftpFolder)$/",
+          "group": "1_create@1"
+        },
+        {
+          "command": "remcon.sftp.rename",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpFile|sftpFolder|sftpLink)$/",
+          "group": "1_create@2"
+        },
+        {
+          "command": "remcon.sftp.upload",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpRoot|sftpFolder)$/",
+          "group": "2_transfer@0"
+        },
+        {
+          "command": "remcon.sftp.download",
+          "when": "view == remcon.sftp && viewItem =~ /^(sftpFile|sftpFolder|sftpLink)$/",
+          "group": "2_transfer@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "remcon.sftp.uploadExplorer",
+          "group": "2_transfer@0"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "key": "ctrl+alt+r",
+        "command": "remcon.refresh",
+        "when": "view == remcon.online || view == remcon.offline"
+      },
+      {
+        "key": "ctrl+alt+q",
+        "command": "remcon.quickConnect"
+      },
+      {
+        "key": "ctrl+alt+w",
+        "command": "remcon.quickDisconnect"
+      },
+      {
+        "key": "ctrl+alt+f",
+        "command": "remcon.search"
+      },
+      {
+        "key": "ctrl+alt+b",
+        "command": "remcon.batch"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "lint:ts": "eslint \"src/**/*.ts\" --ext .ts",
+    "lint:md": "markdownlint \"**/*.md\" --ignore node_modules",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "check": "run-s format lint lint:ts lint:md compile",
+    "package:vsix": "npx vsce package",
+    "package": "run-s compile package:vsix"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/ssh2": "^1.15.5",
+    "@types/ssh2-sftp-client": "^9.0.6",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.9.1",
+    "eslint": "^9.39.3",
+    "markdownlint-cli": "^0.48.0",
+    "npm-run-all2": "^9.0.1",
+    "prettier": "^3.8.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  },
+  "dependencies": {
+    "ssh2": "^1.17.0",
+    "ssh2-sftp-client": "^12.1.1"
+  }
+}
